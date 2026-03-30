@@ -710,6 +710,9 @@ requires-dist = [
     { name = "torchvision" },
 ]
 
+[package.metadata.requires-dev]
+dev = [{ name = "pytest" }]
+
 [[package]]
 name = "cupy-cuda12x"
 version = "13.5.1"

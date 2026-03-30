@@ -22,12 +22,17 @@ uv run scripts/inference_sample.py
 ```
 """
 
+import os
+
+# Prefer Decord: TorchCodec needs matching FFmpeg/native libs, and torchvision 0.26+ removed read_video.
+os.environ.setdefault("FORCE_QWENVL_VIDEO_READER", "decord")
+
 from pathlib import Path
 
 import qwen_vl_utils
 import transformers
 
-ROOT = Path(__file__).parents[2]
+ROOT = Path(__file__).resolve().parent.parent
 SEPARATOR = "-" * 20
 
 

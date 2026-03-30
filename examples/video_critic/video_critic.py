@@ -257,8 +257,7 @@ def run_critic(llm, args):
                 {
                     "type": "video",
                     "video": args.video_path,
-                    # Recommended settings for video critic:
-                    "fps": 16,
+                    "fps": args.video_fps,
                     "total_pixels": 8192 * 28 * 28,
                 },
                 {"type": "text", "text": prompt_config.user_prompt},
@@ -312,6 +311,27 @@ def parse_args():
     parser.add_argument(
         "--model", type=str, default="nvidia/Cosmos-Reason1-7B", help="Model path"
     )
+    parser.add_argument(
+        "--max-model-len",
+        type=int,
+        default=32768,
+        help=(
+            "vLLM max sequence length (KV budget). Lower if EngineCore fails or CUDA OOM "
+            "during startup (default 32768)."
+        ),
+    )
+    parser.add_argument(
+        "--gpu-memory-utilization",
+        type=float,
+        default=0.90,
+        help="Fraction of GPU memory vLLM may use (default 0.90; leaves slack for vision encoder).",
+    )
+    parser.add_argument(
+        "--video-fps",
+        type=int,
+        default=8,
+        help="Frames per second sampled from the video (default 8; lower uses less VRAM than 16).",
+    )
     return parser.parse_args()
 
 
@@ -320,6 +340,8 @@ def main():
 
     llm = LLM(
         model=args.model,
+        max_model_len=args.max_model_len,
+        gpu_memory_utilization=args.gpu_memory_utilization,
         limit_mm_per_prompt={"image": 0, "video": 1},
         enforce_eager=True,
     )

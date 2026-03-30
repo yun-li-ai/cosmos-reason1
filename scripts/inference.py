@@ -137,6 +137,21 @@ def main():
         help="Model revision (branch name, tag name, or commit id)",
     )
     parser.add_argument(
+        "--max-model-len",
+        type=int,
+        default=32768,
+        help=(
+            "vLLM max sequence length (KV cache). Default 32768 avoids OOM when the "
+            "checkpoint's 128k context does not fit your GPU; raise if you have headroom."
+        ),
+    )
+    parser.add_argument(
+        "--gpu-memory-utilization",
+        type=float,
+        default=0.95,
+        help="Fraction of GPU memory vLLM may use (default 0.95).",
+    )
+    parser.add_argument(
         "-v",
         "--verbose",
         action="store_true",
@@ -202,6 +217,8 @@ def main():
     llm = vllm.LLM(
         model=args.model,
         revision=args.revision,
+        max_model_len=args.max_model_len,
+        gpu_memory_utilization=args.gpu_memory_utilization,
         limit_mm_per_prompt={"image": len(images), "video": len(videos)},
         enforce_eager=True,
     )
